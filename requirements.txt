@@ -1,1 +1,1 @@
--e git+https://github.com/mjiggidy/posttools.git@9f1144f2b1baa3b371a8c0e1813e414d6c8a56ed#egg=posttools
+OpenTimelineIO==0.14.1
