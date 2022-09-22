@@ -14,6 +14,7 @@ resolved by cross-referencing the UUID in :attr:`TrackFileResource.track_file_id
 :attr:`imflib.assetmap.Asset.id`\.
 """
 
+import logging
 from xml.dom.minidom import Element
 import xml.etree.ElementTree as et
 import dataclasses, typing, re, abc, datetime, uuid
@@ -292,7 +293,8 @@ class Sequence:
         
         # TODO: Implement additional
         else:
-            raise NotImplementedError(f"Unknown/unsupported/scary sequence type: {xml.tag}")
+            logging.warning("Unknown sequence type: %s\n Ignoring sequence", xml.tag)
+            return None
     
     @property
     def resources(self) -> typing.Iterator["BaseResource"]:
@@ -420,6 +422,8 @@ class Segment:
         id = uuid.UUID(xml.find("Id",ns).text)
         annotation = xsd_optional_usertext(xml.find("Annotation",ns))
         sequence_list = [Sequence.from_xml(sequence,ns) for sequence in xml.find("SequenceList",ns)]
+        # filter out None values
+        sequence_list = [seq for seq in sequence_list if seq is not None]
 
         return cls(
             id=id,
