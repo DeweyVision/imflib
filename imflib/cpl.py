@@ -477,8 +477,8 @@ class ContentVersion:
     label:UserText
     """Description of the version of the content"""
 
-    id:uuid.UUID=dataclasses.field(default_factory=uuid.uuid4)
-    """UUID of the content represented by the CPL"""
+    id:str
+    """id of the content represented by the CPL"""
 
     additional_properties:typing.List[et.Element]=dataclasses.field(default_factory=list)
     """Additional properties of this content version"""
@@ -487,16 +487,12 @@ class ContentVersion:
     @classmethod
     def from_xml(cls, xml:et.ElementTree, ns:typing.Optional[dict]=None)->"ContentVersion":
         """Parse a ContentVersion from XML"""
+
+        id = xml.find("Id",ns).text
         
-        id = uuid.UUID(xml.find("Id",ns).text)
         label = UserText.from_xml(xml.find("LabelText",ns))
 
-        # TODO: Seems kind of hacky here
-        standard = {
-            xml.find("Id",ns),
-            xml.find("LabelText",ns)
-        }
-        additional_properties = [prop for prop in xml if prop not in standard]
+        additional_properties = [prop for prop in xml if prop not in ['Id', 'LabelText']]
         return cls(
             id=id,
             label=label,
@@ -733,7 +729,7 @@ class Cpl:
         """Return an otio RationalTime object from an XSD CompositionTimecodeType"""
 
         if xml is None:
-            raise NotImplementedError
+            return otio.opentime.RationalTime(0,1) if default is None else default
             # return default
 
         tc_addr = xml.find("TimecodeStartAddress",ns).text
