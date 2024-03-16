@@ -91,18 +91,21 @@ class BaseResource(abc.ABC):
         # Generated values
         # If absent, it shall be equal to IntrinsicDuration – EntryPoint.
         if self.source_duration is None: self.source_duration = self.intrinsic_duration-self.entry_point
-        
-        # Non-negative integers
-        if self.intrinsic_duration < 0: raise ValueError("The intrinsic duration must be provided as a non-negative integer")
-        if self.entry_point < 0: raise ValueError("The entry point must be provided as a non-negative integer")
-        if self.source_duration < 0: raise ValueError("The source duration must be provided as a non-negative integer")
 
-        # Positive integers
-        if self.repeat_count < 1: raise ValueError("The repeat count must be provided as a positive integer")
+        try:
+            # Non-negative integers
+            if self.intrinsic_duration < 0: raise ValueError("The intrinsic duration must be provided as a non-negative integer")
+            if self.entry_point < 0: raise ValueError("The entry point must be provided as a non-negative integer")
+            if self.source_duration < 0: raise ValueError("The source duration must be provided as a non-negative integer")
 
-        # Bound integers
-        if self.source_duration > (self.intrinsic_duration-self.entry_point):
-            raise ValueError("The source duration must not exceed IntrinsicDuration-EntryPoint")
+            # Positive integers
+            if self.repeat_count < 1: raise ValueError("The repeat count must be provided as a positive integer")
+
+            # Bound integers
+            if self.source_duration > (self.intrinsic_duration-self.entry_point):
+                raise ValueError("The source duration must not exceed IntrinsicDuration-EntryPoint")
+        except ValueError as e:
+            raise ValueError(f"CPL does not comply with st2067-3-2020 (6.11) spec: {e}")
 
     @property
     def duration(self) -> int:
